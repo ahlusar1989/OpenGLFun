@@ -180,10 +180,8 @@ gl_FragColor = vec4(color, 1.);\n\
   var VIEWMATRIX=LIBS.get_I4();
 
   LIBS.translateZ(VIEWMATRIX, -6);
-  LIBS.translateX(MOVEMATRIX2, 2);
   var THETA=0,
       PHI=0;
-
 
   /*========================= DRAWING ========================= */
   GL.enable(GL.DEPTH_TEST);
@@ -199,17 +197,7 @@ gl_FragColor = vec4(color, 1.);\n\
       THETA+=dX, PHI+=dY;
     }
     LIBS.set_I4(MOVEMATRIX);
-    LIBS.translateX(MOVEMATRIX, -2); //set the first cube's center to [-2,0,0]
-    LIBS.rotateY(MOVEMATRIX, THETA); //
-    LIBS.rotateX(MOVEMATRIX, PHI);
-
-
     LIBS.set_I4(MOVEMATRIX2);
-    LIBS.translateX(MOVEMATRIX2, 2);
-
-    LIBS.rotateY(MOVEMATRIX2, -THETA);
-    LIBS.rotateX(MOVEMATRIX2, -PHI);
-
     var radius=2; //half distance between the cube centers
     var pos_x=radius*Math.cos(PHI)*Math.cos(THETA);
     var pos_y=-radius*Math.sin(PHI);
@@ -218,12 +206,8 @@ gl_FragColor = vec4(color, 1.);\n\
     LIBS.set_position(MOVEMATRIX, pos_x, pos_y, pos_z);
     LIBS.set_position(MOVEMATRIX2, -pos_x, -pos_y, -pos_z);
 
-    
-    time_old=time;
-
-
-
-
+    LIBS.rotateY(MOVEMATRIX, THETA);
+    LIBS.rotateY(MOVEMATRIX2, THETA);
 
     time_old=time;
 

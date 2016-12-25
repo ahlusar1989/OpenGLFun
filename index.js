@@ -1,36 +1,36 @@
 
-var main=function() {
-  var CANVAS=document.getElementById("your_canvas");
-  CANVAS.width=window.innerWidth;
-  CANVAS.height=window.innerHeight;
+var main = function() {
+  var CANVAS = document.getElementById("your_canvas");
+  CANVAS.width = window.innerWidth;
+  CANVAS.height =  window.innerHeight;
 
   /*========================= CAPTURE MOUSE EVENTS ========================= */
 
-  var AMORTIZATION=0.95;
-  var drag=false;
+  var AMORTIZATION = 0.95;
+  var drag = false;
 
 
   var old_x, old_y;
 
-  var dX=0, dY=0;
-  var mouseDown=function(e) {
-    drag=true;
-    old_x=e.pageX, old_y=e.pageY;
+  var dX = 0, dY = 0;
+  var mouseDown = function(e) {
+    drag = true;
+    old_x = e.pageX, old_y = e.pageY;
     e.preventDefault();
     return false;
   };
 
-  var mouseUp=function(e){
-    drag=false;
+  var mouseUp = function(e){
+    drag = false;
   };
 
   var mouseMove=function(e) {
     if (!drag) return false;
-    dX=(e.pageX-old_x)*2*Math.PI/CANVAS.width,
-      dY=(e.pageY-old_y)*2*Math.PI/CANVAS.height;
-    THETA+=dX;
-    PHI+=dY;
-    old_x=e.pageX, old_y=e.pageY;
+    dX = (e.pageX-old_x)*2*Math.PI/CANVAS.width,
+      dY = (e.pageY-old_y)*2*Math.PI/CANVAS.height;
+    THETA += dX;
+    PHI += dY;
+    old_x = e.pageX, old_y = e.pageY;
     e.preventDefault();
   };
 
@@ -84,10 +84,10 @@ gl_FragColor = vec4(color, 1.);\n\
     return shader;
   };
 
-  var shader_vertex=get_shader(shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
-  var shader_fragment=get_shader(shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
+  var shader_vertex = get_shader(shader_vertex_source, GL.VERTEX_SHADER, "VERTEX");
+  var shader_fragment = get_shader(shader_fragment_source, GL.FRAGMENT_SHADER, "FRAGMENT");
 
-  var SHADER_PROGRAM=GL.createProgram();
+  var SHADER_PROGRAM = GL.createProgram();
   GL.attachShader(SHADER_PROGRAM, shader_vertex);
   GL.attachShader(SHADER_PROGRAM, shader_fragment);
 
@@ -167,21 +167,21 @@ gl_FragColor = vec4(color, 1.);\n\
     20,22,23
 
   ];
-  var CUBE_FACES= GL.createBuffer ();
+  var CUBE_FACES = GL.createBuffer ();
   GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, CUBE_FACES);
   GL.bufferData(GL.ELEMENT_ARRAY_BUFFER,
                 new Uint16Array(cube_faces),
     GL.STATIC_DRAW);
   /*========================= MATRIX ========================= */
 
-  var PROJMATRIX=LIBS.get_projection(40, CANVAS.width/CANVAS.height, 1, 100);
-  var MOVEMATRIX=LIBS.get_I4();
-  var MOVEMATRIX2=LIBS.get_I4();
-  var VIEWMATRIX=LIBS.get_I4();
+  var PROJMATRIX = LIBS.get_projection(40, CANVAS.width/CANVAS.height, 1, 100);
+  var MOVEMATRIX = LIBS.get_I4();
+  var MOVEMATRIX2 = LIBS.get_I4();
+  var VIEWMATRIX = LIBS.get_I4();
 
   LIBS.translateZ(VIEWMATRIX, -6);
-  var THETA=0,
-      PHI=0;
+  var THETA = 0,
+      PHI = 0;
 
   /*========================= DRAWING ========================= */
   GL.enable(GL.DEPTH_TEST);
@@ -189,27 +189,31 @@ gl_FragColor = vec4(color, 1.);\n\
   GL.clearColor(0.0, 0.0, 0.0, 0.0);
   GL.clearDepth(1.0);
 
-  var time_old=0;
-  var animate=function(time) {
-    var dt=time-time_old;
+  var time_old = 0;
+  var animate = function(time) {
+    var dt = time-time_old;
     if (!drag) {
-      dX*=AMORTIZATION, dY*=AMORTIZATION;
-      THETA+=dX, PHI+=dY;
+      dX *= AMORTIZATION, dY *= AMORTIZATION;
+      THETA += dX, PHI += dY;
     }
     LIBS.set_I4(MOVEMATRIX);
     LIBS.set_I4(MOVEMATRIX2);
     var radius=2; //half distance between the cube centers
-    var pos_x=radius*Math.cos(PHI)*Math.cos(THETA);
-    var pos_y=-radius*Math.sin(PHI);
-    var pos_z=-radius*Math.cos(PHI)*Math.sin(THETA);
+    var pos_x = radius*Math.cos(PHI) * Math.cos(THETA);
+    var pos_y =- radius*Math.sin(PHI);
+    var pos_z =- radius*Math.cos(PHI) * Math.sin(THETA);
 
     LIBS.set_position(MOVEMATRIX, pos_x, pos_y, pos_z);
     LIBS.set_position(MOVEMATRIX2, -pos_x, -pos_y, -pos_z);
 
+    LIBS.rotateZ(MOVEMATRIX, -PHI);
+    LIBS.rotateZ(MOVEMATRIX2, -PHI);
+
+
     LIBS.rotateY(MOVEMATRIX, THETA);
     LIBS.rotateY(MOVEMATRIX2, THETA);
 
-    time_old=time;
+    time_old = time;
 
     GL.viewport(0.0, 0.0, CANVAS.width, CANVAS.height);
     GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);

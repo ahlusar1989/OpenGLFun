@@ -6,7 +6,7 @@ var main=function() {
 
   /*========================= CAPTURE MOUSE EVENTS ========================= */
 
-  var AMORTIZATION=0.95;
+  var AMORTIZATION=0.995;
   var drag=false;
 
 
@@ -50,7 +50,10 @@ var main=function() {
 
   /*========================= SHADERS ========================= */
   /*jshint multistr: true */
+  // 
+// http://www.songho.ca/opengl/gl_projectionmatrix.html
 
+// View matrix is the movement matrix from Object ref to View reference
   var shader_vertex_source="\n\
 attribute vec3 position;\n\
 uniform mat4 Pmatrix;\n\
@@ -89,7 +92,7 @@ gl_FragColor = vec4(vColor, 1.);\n\
   GL.attachShader(SHADER_PROGRAM, shader_fragment);
 
   GL.linkProgram(SHADER_PROGRAM);
-
+// Variables for Projection and 
   var _Pmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Pmatrix");
   var _Vmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Vmatrix");
   var _Mmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Mmatrix");

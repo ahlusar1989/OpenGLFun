@@ -199,8 +199,21 @@ gl_FragColor = vec4(color, 1.);\n\
       THETA+=dX, PHI+=dY;
     }
     LIBS.set_I4(MOVEMATRIX);
-    LIBS.rotateY(MOVEMATRIX, THETA);
+    LIBS.translateX(MOVEMATRIX, -2); //set the first cube's center to [-2,0,0]
+    LIBS.rotateY(MOVEMATRIX, THETA); //
     LIBS.rotateX(MOVEMATRIX, PHI);
+
+
+    LIBS.set_I4(MOVEMATRIX2);
+    LIBS.translateX(MOVEMATRIX2, 2);
+
+    LIBS.rotateY(MOVEMATRIX2, -THETA);
+    LIBS.rotateX(MOVEMATRIX2, -PHI);
+    time_old=time;
+
+
+
+
 
     time_old=time;
 

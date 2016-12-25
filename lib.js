@@ -1,5 +1,5 @@
 
-var LIBS = {
+var LIBS={
   degToRad: function(angle){
     return(angle*Math.PI/180);
   },
@@ -72,5 +72,9 @@ var LIBS = {
 
   translateZ: function(m, t){
     m[14]+=t;
+  },
+
+  translateX: function(m, t){
+    m[12]+=t;
   }
 };

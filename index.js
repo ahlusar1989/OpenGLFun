@@ -6,7 +6,7 @@ var main=function() {
 
   /*========================= CAPTURE MOUSE EVENTS ========================= */
 
-  var AMORTIZATION=0.995;
+  var AMORTIZATION=0.95;
   var drag=false;
 
 
@@ -50,10 +50,7 @@ var main=function() {
 
   /*========================= SHADERS ========================= */
   /*jshint multistr: true */
-  // 
-// http://www.songho.ca/opengl/gl_projectionmatrix.html
 
-// View matrix is the movement matrix from Object ref to View reference
   var shader_vertex_source="\n\
 attribute vec3 position;\n\
 uniform mat4 Pmatrix;\n\
@@ -70,7 +67,10 @@ vColor=color;\n\
 precision mediump float;\n\
 varying vec3 vColor;\n\
 void main(void) {\n\
-gl_FragColor = vec4(vColor, 1.);\n\
+\n\
+\n\
+vec3 color=vColor;\n\
+gl_FragColor = vec4(color, 1.);\n\
 }";
 
   var get_shader=function(source, type, typeString) {
@@ -92,7 +92,7 @@ gl_FragColor = vec4(vColor, 1.);\n\
   GL.attachShader(SHADER_PROGRAM, shader_fragment);
 
   GL.linkProgram(SHADER_PROGRAM);
-// Variables for Projection and 
+
   var _Pmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Pmatrix");
   var _Vmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Vmatrix");
   var _Mmatrix = GL.getUniformLocation(SHADER_PROGRAM, "Mmatrix");
@@ -172,16 +172,18 @@ gl_FragColor = vec4(vColor, 1.);\n\
   GL.bufferData(GL.ELEMENT_ARRAY_BUFFER,
                 new Uint16Array(cube_faces),
     GL.STATIC_DRAW);
-
   /*========================= MATRIX ========================= */
 
   var PROJMATRIX=LIBS.get_projection(40, CANVAS.width/CANVAS.height, 1, 100);
   var MOVEMATRIX=LIBS.get_I4();
+  var MOVEMATRIX2=LIBS.get_I4();
   var VIEWMATRIX=LIBS.get_I4();
 
   LIBS.translateZ(VIEWMATRIX, -6);
+  LIBS.translateX(MOVEMATRIX2, 2);
   var THETA=0,
       PHI=0;
+
 
   /*========================= DRAWING ========================= */
   GL.enable(GL.DEPTH_TEST);
@@ -199,22 +201,24 @@ gl_FragColor = vec4(vColor, 1.);\n\
     LIBS.set_I4(MOVEMATRIX);
     LIBS.rotateY(MOVEMATRIX, THETA);
     LIBS.rotateX(MOVEMATRIX, PHI);
+
     time_old=time;
 
     GL.viewport(0.0, 0.0, CANVAS.width, CANVAS.height);
     GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-
     GL.uniformMatrix4fv(_Pmatrix, false, PROJMATRIX);
     GL.uniformMatrix4fv(_Vmatrix, false, VIEWMATRIX);
     GL.uniformMatrix4fv(_Mmatrix, false, MOVEMATRIX);
-
     GL.bindBuffer(GL.ARRAY_BUFFER, CUBE_VERTEX);
     GL.vertexAttribPointer(_position, 3, GL.FLOAT, false,4*(3+3),0) ;
     GL.vertexAttribPointer(_color, 3, GL.FLOAT, false,4*(3+3),3*4) ;
-
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, CUBE_FACES);
     GL.drawElements(GL.TRIANGLES, 6*2*3, GL.UNSIGNED_SHORT, 0);
 
+    GL.uniformMatrix4fv(_Mmatrix, false, MOVEMATRIX2);
+
+
+    GL.drawElements(GL.TRIANGLES, 6*2*3, GL.UNSIGNED_SHORT, 0);
     GL.flush();
 
     window.requestAnimationFrame(animate);

@@ -24,7 +24,7 @@ var main = function() {
     drag = false;
   };
 
-  var mouseMove=function(e) {
+  var mouseMove = function(e) {
     if (!drag) return false;
     dX = (e.pageX-old_x)*2*Math.PI/CANVAS.width,
       dY = (e.pageY-old_y)*2*Math.PI/CANVAS.height;
@@ -115,7 +115,7 @@ gl_FragColor = vec4(color, 1.);\n\
 
   /*========================= THE CUBE ========================= */
   //POINTS :
-  var cube_vertex=[
+  var cube_vertex = [
     -1,-1,-1,     1,1,0,
     1,-1,-1,     1,1,0,
     1, 1,-1,     1,1,0,
@@ -148,7 +148,7 @@ gl_FragColor = vec4(color, 1.);\n\
 
   ];
 
-  var CUBE_VERTEX= GL.createBuffer ();
+  var CUBE_VERTEX = GL.createBuffer ();
   GL.bindBuffer(GL.ARRAY_BUFFER, CUBE_VERTEX);
   GL.bufferData(GL.ARRAY_BUFFER,
                 new Float32Array(cube_vertex),

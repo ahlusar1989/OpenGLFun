@@ -51,7 +51,7 @@ var main = function() {
   /*========================= SHADERS ========================= */
   /*jshint multistr: true */
 
-  var shader_vertex_source="\n\
+  var shader_vertex_source = "\n\
 attribute vec3 position;\n\
 uniform mat4 Pmatrix;\n\
 uniform mat4 Vmatrix;\n\
@@ -63,15 +63,21 @@ gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(position, 1.);\n\
 vColor=color;\n\
 }";
 
-  var shader_fragment_source="\n\
+  var shader_fragment_source = "\n\
 precision mediump float;\n\
+uniform float greyscality;\n\
 varying vec3 vColor;\n\
 void main(void) {\n\
 \n\
 \n\
-vec3 color=vColor;\n\
+float greyscaleValue=(vColor.r+vColor.g+vColor.b)/3.;\n\
+vec3 greyscaleColor=vec3(greyscaleValue,greyscaleValue,greyscaleValue);\n\
+\n\
+\n\
+vec3 color=mix(greyscaleColor, vColor, greyscality);\n\
 gl_FragColor = vec4(color, 1.);\n\
 }";
+
 
   var get_shader=function(source, type, typeString) {
     var shader = GL.createShader(type);
@@ -99,6 +105,8 @@ gl_FragColor = vec4(color, 1.);\n\
 
   var _color = GL.getAttribLocation(SHADER_PROGRAM, "color");
   var _position = GL.getAttribLocation(SHADER_PROGRAM, "position");
+  var _greyscality=GL.getUniformLocation(SHADER_PROGRAM, "greyscality");
+
 
   GL.enableVertexAttribArray(_color);
   GL.enableVertexAttribArray(_position);
@@ -178,10 +186,46 @@ gl_FragColor = vec4(color, 1.);\n\
   var MOVEMATRIX = LIBS.get_I4();
   var MOVEMATRIX2 = LIBS.get_I4();
   var VIEWMATRIX = LIBS.get_I4();
+  var MOVEMATRIX_TETRA=LIBS.get_I4();
+
 
   LIBS.translateZ(VIEWMATRIX, -6);
   var THETA = 0,
       PHI = 0;
+
+
+  /*========================= THE TETRAHEDRON ========================= */
+  //POINTS :
+  var tetrahedron_vertex=[
+    //base face points, included in the plane y=-1
+    -1,-1,-1,     1,0,0,
+    1,-1,-1,     0,1,0,
+    0,-1,1,      0,0,1,
+
+    //summit, in white
+    0,1,0,     1,1,1
+  ];
+
+  var TETRAHEDRON_VERTEX= GL.createBuffer ();
+  GL.bindBuffer(GL.ARRAY_BUFFER, TETRAHEDRON_VERTEX);
+  GL.bufferData(GL.ARRAY_BUFFER,
+                new Float32Array(tetrahedron_vertex),
+    GL.STATIC_DRAW);
+
+  //TETRAHEDRON FACES :
+  var tetrahedron_faces = [
+    0,1,2, //base
+
+    0,1,3, //side 0
+    1,2,3, //side 1
+    0,2,3  //side 2
+  ];
+  var TETRAHEDRON_FACES= GL.createBuffer ();
+  GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, TETRAHEDRON_FACES);
+  GL.bufferData(GL.ELEMENT_ARRAY_BUFFER,
+                new Uint16Array(tetrahedron_faces),
+    GL.STATIC_DRAW);
+
 
   /*========================= DRAWING ========================= */
   GL.enable(GL.DEPTH_TEST);
@@ -210,6 +254,10 @@ gl_FragColor = vec4(color, 1.);\n\
     LIBS.rotateZ(MOVEMATRIX2, -PHI);
 
 
+    LIBS.rotateX(MOVEMATRIX_TETRA, dt*0.0031);
+    LIBS.rotateZ(MOVEMATRIX_TETRA, Math.cos(time)*dt*0.0022);
+    LIBS.rotateY(MOVEMATRIX_TETRA, dt*-0.0034);
+
     LIBS.rotateY(MOVEMATRIX, THETA);
     LIBS.rotateY(MOVEMATRIX2, THETA);
 
@@ -230,6 +278,17 @@ gl_FragColor = vec4(color, 1.);\n\
 
 
     GL.drawElements(GL.TRIANGLES, 6*2*3, GL.UNSIGNED_SHORT, 0);
+
+
+    GL.uniform1f(_greyscality, 1);
+    GL.uniformMatrix4fv(_Mmatrix, false, MOVEMATRIX_TETRA);
+    GL.bindBuffer(GL.ARRAY_BUFFER, TETRAHEDRON_VERTEX);
+    GL.vertexAttribPointer(_position, 3, GL.FLOAT, false,4*(3+3),0) ;
+    GL.vertexAttribPointer(_color, 3, GL.FLOAT, false,4*(3+3),3*4) ;
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, TETRAHEDRON_FACES);
+    GL.drawElements(GL.TRIANGLES, 3*4, GL.UNSIGNED_SHORT, 0);
+
+
     GL.flush();
 
     window.requestAnimationFrame(animate);

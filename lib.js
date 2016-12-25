@@ -35,7 +35,8 @@ var LIBS={
     var c=Math.cos(angle);
     var s=Math.sin(angle);
     var mv1=m[1], mv5=m[5], mv9=m[9];
-    m[1]=m[1]*c-m[2]*s;
+
+    m[1]=m[1]*c- m[2]*s;
     m[5]=m[5]*c-m[6]*s;
     m[9]=m[9]*c-m[10]*s;
 
@@ -73,7 +74,7 @@ var LIBS={
   translateZ: function(m, t){
     m[14]+=t;
   },
-  
+
   set_position: function(m,x,y,z) {
     m[12]=x, m[13]=y, m[14]=z;
   },

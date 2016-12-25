@@ -209,6 +209,16 @@ gl_FragColor = vec4(color, 1.);\n\
 
     LIBS.rotateY(MOVEMATRIX2, -THETA);
     LIBS.rotateX(MOVEMATRIX2, -PHI);
+
+    var radius=2; //half distance between the cube centers
+    var pos_x=radius*Math.cos(PHI)*Math.cos(THETA);
+    var pos_y=-radius*Math.sin(PHI);
+    var pos_z=-radius*Math.cos(PHI)*Math.sin(THETA);
+
+    LIBS.set_position(MOVEMATRIX, pos_x, pos_y, pos_z);
+    LIBS.set_position(MOVEMATRIX2, -pos_x, -pos_y, -pos_z);
+
+    
     time_old=time;
 
 
